@@ -7,27 +7,48 @@ void todo() {
 }
 
 char getFile() {
-    FILE *file;
-    char fileName[15];
-    char *_kimchiContent[16383], temp;
+    FILE *_readFile;
+    char _fileName[15], *_buffer;
+    long _fileSize;
 
     printf("학번을 입력하세요: ");  
-    scanf("%s", fileName);
+    scanf("%s", _fileName);
 
-    file = fopen("a20622.txt", "r");
-    if (file == NULL) {
+    _readFile = fopen(_fileName, "r");
+    if (_readFile == NULL) {
         perror("파일 열기 실패");
         return 1;
-    }  
+    } 
+    
+    fseek(_readFile, 0, SEEK_END);
+    _fileSize = ftell(_readFile);
+    rewind(_readFile);
 
-    fclose(file);
+    // 파일 내용을 저장할 메모리 할당
+    _buffer = (char*)malloc(sizeof(char) * (_fileSize + 1));
+    if (_buffer == NULL) {
+        perror("메모리 할당 실패");
+        fclose(_readFile);
+        return 1;
+    }
 
-    return _kimchiContent;
+    // 파일 내용 읽기
+    fread(_buffer, sizeof(char), _fileSize, _readFile);
+    _buffer[_fileSize] = '\0'; // 문자열 끝에 null 문자 추가
+
+    // 파일 내용 출력
+    printf("파일 내용:\n%s\n", _buffer);
+
+    // 자원 해제
+    fclose(_readFile);
+    return _buffer;
+    // free(_buffer);
+
 }
 
 
 int main() {
-    getFile();
+    printf("%s", getFile());
 
     todo();
     
