@@ -1,8 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <windows.h>
 
 char clearPrompt[10] = "cls";
+
+void showPlan(char buffer[], char isDone) {
+    system(clearPrompt);
+    printf("----------------------------------------------------\n");
+    printf("%s: %s", buffer, isDone == '1' ? "[ V ] Complete!\n" : "[  ] Work in progress...\n");
+    // if (isDone[0] == '1') {
+    //     printf("Complete!\n");
+    // } else if (isDone[0] == '0') {
+    //     printf("Processing..\n");
+    // }
+    printf("----------------------------------------------------\n");
+    printf("0: Quit / 1: Change completion  / 2: Delete / 3: Back.. \n> ");
+}
 
 int start() {
     FILE *_readFile, *_booleanFile, *_writeFile, *_booleanFileWrite;
@@ -25,9 +39,11 @@ int start() {
         char plan[1001];
 
         printf("----------------------------------------------------\n");
-        printf("%s Plan (Don't enter space): ", date);
+        printf("Plan on %s (Don't Enter Space): ", date);
         scanf("%s", plan);
         printf("Complete!\n");
+        Sleep(1000);
+        
 
         fwrite(plan, sizeof(char), strlen(plan), _writeFile);
         fwrite("0", sizeof(char), 1, _booleanFileWrite);
@@ -52,31 +68,34 @@ int start() {
     fread(_buffer, sizeof(char), _fileSize, _readFile);
     _buffer[_fileSize] = '\0';
 
-    fread(isDone, sizeof(char), 1, _booleanFile);
-
-        system(clearPrompt);
-    printf("----------------------------------------------------\n");
-    printf("%s: ", _buffer);
+    fread(isDone, sizeof(char), 1, _booleanFile);    
 
     while (1) {
         int selection;
-
-        if (isDone[0] == '1') {
-            printf("Complete!\n");
-        } else if (isDone[0] == '0') {
-            printf("Processing..\n");
-        }
-
-        printf("----------------------------------------------------\n");
-        printf("0: Quit / 1: Modify / 2: Other day.. \n> ");
+        
+        // system(clearPrompt);
+        // printf("----------------------------------------------------\n");
+        // printf("%s: %s", _buffer, isDone[0] == '1' ? "[ V ] Complete!\n" : "[  ] Work in progress...\n");
+        // // if (isDone[0] == '1') {
+        // //     printf("Complete!\n");
+        // // } else if (isDone[0] == '0') {
+        // //     printf("Processing..\n");
+        // // }
+        // printf("----------------------------------------------------\n");
+        // printf("0: Quit / 1: Change completion  / 2: Delete / 3: Back.. \n> ");
+        showPlan(_buffer, isDone[0]);
 
         scanf("%d", &selection);
 
         if (selection == 1) {
             _booleanFileWrite = fopen(dataFileName, "w");
+
             char valueToWrite = (isDone[0] == '0') ? '1' : '0';
+            
             fwrite(&valueToWrite, sizeof(char), 1, _booleanFileWrite);
             fclose(_booleanFileWrite);
+
+
 
             isDone[1] = &valueToWrite;
 
