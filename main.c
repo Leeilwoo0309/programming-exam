@@ -7,25 +7,25 @@ char clearPrompt[10] = "cls";
 
 void showPlan(char buffer[], char isDone) {
     system(clearPrompt);
-    printf("----------------------------------------------------\n");
-    printf("%s: %s", buffer, isDone == '1' ? "[ V ] Complete!\n" : "[  ] Work in progress...\n");
-    // if (isDone[0] == '1') {
-    //     printf("Complete!\n");
-    // } else if (isDone[0] == '0') {
-    //     printf("Processing..\n");
-    // }
-    printf("----------------------------------------------------\n");
-    printf("0: Quit / 1: Change completion  / 2: Delete / 3: Back.. \n> ");
+    printf("\n--------------------------SCHEDULER--------------------------\n\n");
+    printf("[ %c ] %s: %s",
+        isDone == '1' ? 'V' : '\0',
+        buffer,
+        isDone == '1' ? "Complete!\n" : "Work in progress...\n"
+    );
+    printf("\n\n========================================================\n");
+    printf(" 0: Quit / 1: Change completion  / 2: Delete / 3: Back..  ");
+    printf("\n========================================================\n> ");
 }
 
-int start() {
+int execute() {
     FILE *_readFile, *_booleanFile, *_writeFile, *_booleanFileWrite;
     char _fileName[15], *_buffer, isDone[1], date[10], dataFileName[10];
     long _fileSize;
 
     system(clearPrompt);
-    printf("----------------------------------------------------\n");
-    printf("Please Enter the Date \n > ");
+    printf("\n--------------------------SCHEDULER--------------------------\n\n");
+    printf("  Please Enter the Date > ");
     scanf("%s", date);
 
     sprintf(dataFileName, "%sb", date);
@@ -38,7 +38,7 @@ int start() {
 
         char plan[1001];
 
-        printf("----------------------------------------------------\n");
+        printf("\n--------------------------SCHEDULER--------------------------\n");
         printf("Plan on %s (Don't Enter Space): ", date);
         scanf("%s", plan);
         printf("Complete!\n");
@@ -71,18 +71,9 @@ int start() {
     fread(isDone, sizeof(char), 1, _booleanFile);    
 
     while (1) {
+        int a = isDone[0];
         int selection;
         
-        // system(clearPrompt);
-        // printf("----------------------------------------------------\n");
-        // printf("%s: %s", _buffer, isDone[0] == '1' ? "[ V ] Complete!\n" : "[  ] Work in progress...\n");
-        // // if (isDone[0] == '1') {
-        // //     printf("Complete!\n");
-        // // } else if (isDone[0] == '0') {
-        // //     printf("Processing..\n");
-        // // }
-        // printf("----------------------------------------------------\n");
-        // printf("0: Quit / 1: Change completion  / 2: Delete / 3: Back.. \n> ");
         showPlan(_buffer, isDone[0]);
 
         scanf("%d", &selection);
@@ -90,18 +81,31 @@ int start() {
         if (selection == 1) {
             _booleanFileWrite = fopen(dataFileName, "w");
 
-            char valueToWrite = (isDone[0] == '0') ? '1' : '0';
+            char valueToWrite = a == '1' ? '0' : '1';
             
             fwrite(&valueToWrite, sizeof(char), 1, _booleanFileWrite);
             fclose(_booleanFileWrite);
 
+            isDone[0] = &valueToWrite;
 
-
-            isDone[1] = &valueToWrite;
+            printf("Changed!");
+            Sleep(1000);
 
             break;
         } else if (selection == 2) {
-            system("clear");
+            fclose(_readFile);
+            fclose(_writeFile);
+            fclose(_booleanFile);
+            fclose(_booleanFileWrite);
+
+            char command1[100], command2[100];
+            sprintf(command1, "del %s", date);
+            system(command1);
+            system("y");
+
+            break;
+        } else if (selection == 3) {
+            system("cls");
             break;
         } else if (selection == 0) {
             return -1;
@@ -114,12 +118,11 @@ int start() {
     return 0;
 }
 
-
 int main() {
     int ret;
 
     while (ret != -1) {
-        ret = start();
+        ret = execute();
     }
 
     return 0;
